@@ -1,4 +1,10 @@
-import { DEFAULT_COMMUNITY_CONTENT, FirebaseConfigurationError, getCommunityContent } from "@/lib/community-content";
+import {
+  DEFAULT_COMMUNITY_CONTENT,
+  FirebaseConfigurationError,
+  FIRESTORE_PERMISSION_ERROR_MESSAGE,
+  getCommunityContent,
+  isFirestorePermissionDenied,
+} from "@/lib/community-content";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +22,13 @@ export default async function Home() {
     try {
       content = await getCommunityContent();
     } catch (error) {
-      if (!(error instanceof FirebaseConfigurationError)) throw error;
-      console.error("Firebase credentials are invalid; showing default community content:", error.message);
+      if (error instanceof FirebaseConfigurationError) {
+        console.error("Firebase credentials are invalid; showing default community content:", error.message);
+      } else if (isFirestorePermissionDenied(error)) {
+        console.error(`${FIRESTORE_PERMISSION_ERROR_MESSAGE} Showing default community content.`, error);
+      } else {
+        throw error;
+      }
     }
   }
 

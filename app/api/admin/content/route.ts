@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE, hasValidAdminSession } from "@/lib/admin-auth";
-import { getCommunityContent, saveCommunityContent } from "@/lib/community-content";
+import {
+  FIRESTORE_PERMISSION_ERROR_MESSAGE,
+  getCommunityContent,
+  isFirestorePermissionDenied,
+  saveCommunityContent,
+} from "@/lib/community-content";
 
 export const runtime = "nodejs";
 
@@ -17,7 +22,10 @@ export async function GET() {
     return NextResponse.json(await getCommunityContent());
   } catch (error) {
     console.error("Could not load community content from Firestore:", error);
-    return NextResponse.json({ error: "Firestore is not configured. Check the Firebase server credentials." }, { status: 503 });
+    const message = isFirestorePermissionDenied(error)
+      ? FIRESTORE_PERMISSION_ERROR_MESSAGE
+      : "Could not load Firestore content. Check the Firebase server credentials.";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 }
 
@@ -40,6 +48,9 @@ export async function PUT(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Could not save community content to Firestore:", error);
-    return NextResponse.json({ error: "Could not save changes. Check the Firebase server credentials and try again." }, { status: 503 });
+    const message = isFirestorePermissionDenied(error)
+      ? FIRESTORE_PERMISSION_ERROR_MESSAGE
+      : "Could not save changes. Check the Firebase server credentials and try again.";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 }

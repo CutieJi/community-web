@@ -2,7 +2,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_COOKIE, hasValidAdminSession } from "@/lib/admin-auth";
 import { AdminDashboard } from "./admin-dashboard";
-import { FirebaseConfigurationError, getCommunityContent } from "@/lib/community-content";
+import {
+  FirebaseConfigurationError,
+  FIRESTORE_PERMISSION_ERROR_MESSAGE,
+  getCommunityContent,
+  isFirestorePermissionDenied,
+} from "@/lib/community-content";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +24,9 @@ export default async function AdminPage() {
     console.error("Could not load community content from Firestore:", error);
     loadError = error instanceof FirebaseConfigurationError
       ? error.message
-      : "Could not load Firestore content. Check the Firebase server credentials and try again.";
+      : isFirestorePermissionDenied(error)
+        ? FIRESTORE_PERMISSION_ERROR_MESSAGE
+        : "Could not load Firestore content. Check the Firebase server credentials and try again.";
   }
 
   return <AdminDashboard initialContent={content} loadError={loadError} />;

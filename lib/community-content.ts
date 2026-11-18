@@ -15,6 +15,14 @@ export class FirebaseConfigurationError extends Error {
   }
 }
 
+export const FIRESTORE_PERMISSION_ERROR_MESSAGE =
+  "Firestore denied access. Grant the service account the Cloud Datastore User (roles/datastore.user) role in Google Cloud IAM.";
+
+export function isFirestorePermissionDenied(error: unknown) {
+  if (typeof error !== "object" || error === null || !("code" in error)) return false;
+  return error.code === 7 || error.code === "permission-denied" || error.code === "PERMISSION_DENIED";
+}
+
 export const DEFAULT_COMMUNITY_CONTENT: CommunityContent = {
   welcome: "A cozy corner of the internet for curious minds, kind humans, and whatever you’re into this week.",
   announcement: "",

@@ -1,32 +1,38 @@
-# Gather community
+# Navi Co. community website — V1
 
-A simple, responsive community website built with Next.js, with Discord invite links and a password-protected admin area.
+A responsive community-site starter built with Node.js, Vite, vanilla HTML/CSS/JavaScript, and Supabase. It lives in this folder as a standalone project.
 
-## Get started
+## Run locally
 
-1. Install Node.js 22 or newer.
-2. Copy `.env.example` to `.env.local` and fill in the values below.
-3. Install dependencies and start the dev server:
+1. Install Node.js 20 or later.
+2. From this folder, run `npm install`.
+3. Copy `.env.example` to `.env` and set your Supabase project URL and **anon/publishable key**.
+4. Run `npm run dev`, then open the local URL Vite prints.
+5. To build for production, run `npm run build`.
 
-   ```sh
-   npm install
-   npm run dev
-   ```
+Never put a Supabase `service_role` key in this browser app or commit real credentials.
 
-The community site is at `http://localhost:3000`; the admin sign-in is at `http://localhost:3000/admin/login`.
+## Supabase setup
 
-## Environment
+1. Create a Supabase project and run [`supabase/schema.sql`](./supabase/schema.sql) in its SQL editor.
+2. Enable Email/Password and whichever OAuth providers you want (Google, GitHub, Discord) in Supabase Auth. Add the local and deployed site URLs to the Auth redirect allow list and configure provider credentials in Supabase.
+3. Create the first admin user through Supabase Auth. In the Supabase dashboard or a trusted server-side admin tool, set that user's **app_metadata** to `{"role":"admin"}`. Do not assign roles from user-editable metadata or this website.
+4. Enable Realtime for `public.discussion_messages` if you want live chat updates.
+5. Deploy all three Edge Functions under `supabase/functions/`. Set `META_PAGE_ID`, `META_PAGE_ACCESS_TOKEN`, and `META_GRAPH_API_VERSION` as secrets for `publish-freedom-post`; Supabase supplies the project URL and keys, including the service role key. Keep all service-role and Meta secrets server-side.
 
-- `NEXT_PUBLIC_DISCORD_INVITE_URL`: your Discord server invite URL.
-- `ADMIN_PASSWORD`: a long, unique admin password. Keep it private.
-- `ADMIN_SESSION_SECRET`: a separate, long random secret used to sign seven-day, HTTP-only admin sessions.
-- `FIREBASE_PROJECT_ID`: your Firebase project ID.
-- `FIREBASE_SERVICE_ACCOUNT_JSON`: the complete service account JSON downloaded from Firebase Console, pasted as one line. The example is intentionally blank; placeholder keys are not valid credentials. This is server-only; never add service-account credentials to client code or commit them.
+## What's included
 
-To run locally, use `npm run dev`. For production, configure the same environment variables in your hosting provider, then run `npm run build` and `npm start`.
+- Public home page, community feature sections, promotion cards, contact link, and responsive navigation.
+- Public promotion-request form with an admin-only review queue; approval atomically publishes the request as a community promotion.
+- Email/password sign-up and sign-in, plus Google, GitHub, and Discord OAuth buttons.
+- Freedom Wall submissions have no user ID or IP column, are inserted as pending, and only approved posts are publicly readable. Admins can approve, reject, and delete submissions.
+- Authenticated discussion chat, member list and suspend/restore controls, announcement and promotion CRUD in the admin page at `/admin.html`. Admin account changes are server-side and cannot suspend admin accounts or the current admin.
+- RLS policies are included with the schema. Admin status is checked using trusted Supabase `app_metadata`.
 
-## Admin and Firestore
+## Production integrations and privacy notes
 
-The admin area uses the shared `ADMIN_PASSWORD` and an HMAC-signed, HTTP-only cookie; Firebase is used only for database storage. The admin editor stores its welcome note and announcement in the Firestore document `site/community`. Firebase Admin SDK credentials are read only by server code. If Firestore is not configured, the admin UI explains that saving is unavailable; it does not pretend changes were saved.
-
-Grant the service account the **Cloud Datastore User** role (`roles/datastore.user`) in Google Cloud IAM so the Firebase Admin SDK can read and write Firestore. This server-side access is controlled by IAM, not Firestore security rules; do not make the database rules public. Protect the admin password and session secret, use HTTPS in production, and rotate credentials if they are exposed. This initial admin setup is intended for a small, single-owner community.
+- Facebook publishing requires deploying the Edge Function and configuring the Meta Page token and Graph API version. The function only publishes approved posts, claims each post to avoid concurrent duplicates, and records failures so admins can retry. If Facebook accepted a post but the database update failed, check the Page before retrying to avoid a duplicate.
+- The Freedom Wall intentionally does not store a submitter account ID or IP in its table. Database/platform infrastructure may still retain operational logs; do not promise absolute anonymity without reviewing your Supabase hosting and retention settings. Public submission also needs server-side rate limiting and abuse controls before launch.
+- The member screen lists up to 200 accounts. Suspension/restoration is handled by an admin-only Edge Function; admin accounts and the current administrator cannot be suspended there.
+- Configure and review OAuth redirect URLs, email confirmation, backups, moderation workflow, and privacy/terms pages before production.
+- Points, rewards, trading conversion, mini-games, events, and the e-goods shop are roadmap items, not active V1 functionality. Implement and review the rules, payment/provider APIs, and fraud controls before enabling them.

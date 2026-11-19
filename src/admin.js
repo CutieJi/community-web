@@ -1,9 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabase.js';
 import './styles.css';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 const byId = (id) => document.getElementById(id);
 const contentDialog = byId('content-dialog');
 
@@ -38,6 +35,13 @@ async function requireAdmin() {
     feedback(byId('admin-login-feedback'), 'Supabase is not configured. Copy .env.example to .env and add your project credentials.', true);
     return;
   }
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) {
+    feedback(byId('admin-login-feedback'), sessionError.message, true);
+    return;
+  }
+  if (!session) return;
+
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) {
     feedback(byId('admin-login-feedback'), error.message, true);

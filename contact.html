@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111311" />
+    <meta name="description" content="Contact Navi Co. or request a community promotion." />
+    <title>Contact — Navi Co.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body data-page="contact">
+    <div class="announcement"><span class="live-dot"></span> A new corner of the internet is taking shape <a href="/about.html">Meet Navi Co. <span>↗</span></a></div>
+    <header class="site-header">
+      <a class="brand" href="/index.html" aria-label="Navi Co. home"><span class="brand-mark">n</span><span>navi<span class="brand-light">co.</span></span></a><button class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <nav class="main-nav" aria-label="Main navigation"><a href="/index.html">Home</a><a href="/about.html">About</a><a href="/freedomwall.html">Freedom wall</a><a href="/connect.html">Connect</a><a class="active" href="/contact.html">Contact</a></nav>
+      <div class="header-actions"><a class="button button-outline" href="/login.html">Log in</a><a class="button button-accent" href="/signup.html">Sign up <span>↗</span></a></div>
+    </header>
+    <main>
+      <section class="page-hero section-wrap">
+        <div class="eyebrow"><span class="eyebrow-line"></span> GOT SOMETHING?</div>
+        <h1>Let's make<br />something <span>good.</span></h1>
+        <p>Want to promote your brand, collaborate, or just say hi? We'd love to hear from you.</p>
+      </section>
+      <section class="section-wrap contact-page-content">
+        <div class="contact-card">
+          <div class="eyebrow"><span class="eyebrow-line"></span> SAY HELLO</div>
+          <h2>Let's talk.</h2>
+          <p>For general questions and collaborations, send us a note. For brand and creator spotlights, use the request form.</p>
+          <a class="contact-email" href="mailto:hello@navico.community">hello@navico.community <span>↗</span></a>
+        </div>
+        <div class="promotion-request">
+          <div><span class="card-index">YOUR BRAND BELONGS HERE</span><h3>Request a spotlight.</h3><p>Tell us what you're building. Our team reviews every request before it appears on the page.</p></div>
+          <form id="promotion-request-form">
+            <label for="request-brand">Brand or creator name<input id="request-brand" name="brand" maxlength="120" required /></label>
+            <label for="request-description">A short intro<textarea id="request-description" name="description" maxlength="500" required></textarea></label>
+            <label for="request-url">Website or social link<input id="request-url" name="url" type="url" placeholder="https://" required /></label>
+            <label for="request-email">Contact email<input id="request-email" name="email" type="email" required /></label>
+            <button class="button button-dark" type="submit">Send for review <span>↗</span></button>
+            <p class="form-note">Your contact email is only visible to community admins and isn't shown on the public page.</p>
+            <div class="form-message" id="promotion-feedback" role="status"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="footer-top"><a class="brand" href="/index.html"><span class="brand-mark">n</span><span>navi<span class="brand-light">co.</span></span></a><p>A little corner of the internet<br />to be a little more you.</p><a class="back-top" href="/index.html">BACK TO HOME ↑</a></div><div class="footer-bottom"><span>© <span class="year"></span> NAVI CO. MADE WITH COMMUNITY IN MIND.</span><span>BE KIND OUT THERE <b>✳</b></span></div></footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

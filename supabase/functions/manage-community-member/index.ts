@@ -41,10 +41,16 @@ Deno.serve(async (request) => {
   if (body.action === 'list') {
     const { data, error } = await serviceClient.auth.admin.listUsers({ page: 1, perPage: 200 });
     if (error) return respond({ error: `Could not load community members: ${error.message}` }, 500);
+    const userIds = data.users.map((member) => member.id);
+    const { data: profiles, error: profilesError } = userIds.length
+      ? await serviceClient.from('profiles').select('id, username').in('id', userIds)
+      : { data: [], error: null };
+    if (profilesError) return respond({ error: `Could not load member profiles: ${profilesError.message}` }, 500);
+    const usernameById = new Map((profiles ?? []).map((profile) => [profile.id, profile.username]));
     const members = data.users.map((member) => ({
       id: member.id,
       email: member.email ?? null,
-      username: member.user_metadata?.username ?? null,
+      username: usernameById.get(member.id) ?? member.user_metadata?.username ?? null,
       created_at: member.created_at,
       isAdmin: member.app_metadata?.role === 'admin',
       suspended: Boolean(member.banned_until && Date.parse(member.banned_until) > Date.now())

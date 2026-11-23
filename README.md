@@ -1,6 +1,6 @@
 # Navi Co. community website
 
-A Laravel 12 MVC implementation of the Navi Co. community site.
+A React SPA frontend backed by Laravel 12 JSON endpoints.
 
 ## Run locally
 
@@ -13,16 +13,17 @@ A Laravel 12 MVC implementation of the Navi Co. community site.
 7. Run `npm install` and `npm run build`.
 8. Start the app with `php artisan serve`.
 
-## Main pages
+## React pages
 
 - `/` — home
-- `/freedomwall.html` — anonymous Freedom Wall
-- `/connect.html` — authenticated community chat
-- `/contact.html` — promotion requests
-- `/profile.html` — member account settings
-- `/admin.html` — admin moderation dashboard
+- `/about` — about Navi Co.
+- `/freedomwall` — anonymous Freedom Wall
+- `/connect` — authenticated community chat
+- `/contact` — promotion requests
+- `/profile` — member account settings
+- `/admin` — admin moderation dashboard
 
-Create the first admin account through Laravel Tinker:
+The React app is in `resources/js/app.jsx`; Laravel serves a minimal Blade mount shell and the JSON API. Create the first admin account through Laravel Tinker:
 
 ```powershell
 php artisan tinker

@@ -2,9 +2,11 @@
 
 ## Requirements
 
-- XAMPP with Apache and MySQL (MariaDB) installed; PHP 8.2+ is supported
-- PHP 8.3+ and Composer
+- XAMPP with Apache and MySQL (MariaDB) installed
+- PHP 8.2+ and Composer
 - Node.js and npm for compiling frontend assets
+
+The UI is a React SPA served by Laravel. Its API uses the same-origin Laravel session and CSRF protection.
 
 ## Configure MySQL
 

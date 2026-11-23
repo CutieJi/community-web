@@ -1,43 +1,41 @@
 <?php
 
+use App\Http\Controllers\ReactApiController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CommunityController;
-use App\Http\Controllers\ProfileController;
 
-Route::get('/', [CommunityController::class, 'home'])->name('home');
-Route::get('/about.html', fn () => view('pages.about'))->name('about');
-Route::get('/freedomwall.html', [CommunityController::class, 'freedomWall'])->name('freedom-wall');
-Route::post('/freedomwall.html', [CommunityController::class, 'submitFreedomPost'])->name('freedom-wall.store');
-Route::get('/contact.html', [CommunityController::class, 'contact'])->name('contact');
-Route::post('/promotion-requests', [CommunityController::class, 'submitPromotionRequest'])->name('promotion-request.store');
-Route::get('/connect.html', [CommunityController::class, 'connect'])->name('connect');
+Route::prefix('api')->group(function () {
+    Route::get('/session', [ReactApiController::class, 'session']);
+    Route::post('/login', [ReactApiController::class, 'login']);
+    Route::post('/register', [ReactApiController::class, 'register']);
+    Route::post('/logout', [ReactApiController::class, 'logout'])->middleware('auth');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login.html', fn () => view('pages.login'))->name('login');
-    Route::post('/login.html', [AuthController::class, 'login']);
-    Route::get('/signup.html', fn () => view('pages.signup'))->name('register');
-    Route::post('/signup.html', [AuthController::class, 'register']);
+    Route::get('/home', [ReactApiController::class, 'home']);
+    Route::get('/freedom-wall', [ReactApiController::class, 'freedomWall']);
+    Route::post('/freedom-wall', [ReactApiController::class, 'submitFreedomPost'])->middleware('throttle:10,1');
+    Route::post('/promotion-requests', [ReactApiController::class, 'submitPromotionRequest'])->middleware('throttle:5,1');
+    Route::get('/connect', [ReactApiController::class, 'connect'])->middleware('auth');
+    Route::post('/connect/messages', [ReactApiController::class, 'sendMessage'])->middleware('auth');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('/profile', [ReactApiController::class, 'profile']);
+        Route::patch('/profile/username', [ReactApiController::class, 'updateUsername']);
+        Route::patch('/profile/password', [ReactApiController::class, 'updatePassword']);
+        Route::delete('/profile', [ReactApiController::class, 'deleteAccount']);
+    });
+
+    Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+        Route::get('/', [ReactApiController::class, 'admin']);
+        Route::patch('/freedom-wall/{post}/status', [ReactApiController::class, 'moderateFreedomPost']);
+        Route::delete('/freedom-wall/{post}', [ReactApiController::class, 'deleteFreedomPost']);
+        Route::post('/promotion-requests/{promotionRequest}/approve', [ReactApiController::class, 'approveRequest']);
+        Route::patch('/promotion-requests/{promotionRequest}', [ReactApiController::class, 'updateRequestStatus']);
+        Route::delete('/promotion-requests/{promotionRequest}', [ReactApiController::class, 'deleteRequest']);
+        Route::post('/content', [ReactApiController::class, 'storeContent']);
+        Route::patch('/content/{kind}/{id}', [ReactApiController::class, 'updateContent']);
+        Route::delete('/content/{kind}/{id}', [ReactApiController::class, 'deleteContent']);
+        Route::patch('/users/{user}', [ReactApiController::class, 'updateMember']);
+    });
 });
 
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/connect/messages', [CommunityController::class, 'sendMessage'])->name('messages.store');
-    Route::get('/profile.html', [ProfileController::class, 'edit'])->name('profile');
-    Route::patch('/profile/username', [ProfileController::class, 'updateUsername'])->name('profile.username');
-    Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin.html', [AdminController::class, 'index'])->name('admin');
-    Route::patch('/admin/freedom-wall/{post}/status', [AdminController::class, 'moderateFreedomPost'])->name('admin.freedom.status');
-    Route::delete('/admin/freedom-wall/{post}', [AdminController::class, 'deleteFreedomPost'])->name('admin.freedom.delete');
-    Route::post('/admin/promotion-requests/{request}/approve', [AdminController::class, 'approveRequest'])->name('admin.request.approve');
-    Route::post('/admin/promotion-requests/{request}/reject', [AdminController::class, 'rejectRequest'])->name('admin.request.reject');
-    Route::delete('/admin/promotion-requests/{request}', [AdminController::class, 'deleteRequest'])->name('admin.request.delete');
-    Route::post('/admin/content', [AdminController::class, 'storeContent'])->name('admin.content.store');
-    Route::delete('/admin/content', [AdminController::class, 'deleteContent'])->name('admin.content.delete');
-    Route::patch('/admin/users/{user}', [AdminController::class, 'updateMember'])->name('admin.member.update');
-});
+Route::view('/', 'app')->name('home');
+Route::view('/{path}', 'app')->where('path', '^(?!api/).*$');

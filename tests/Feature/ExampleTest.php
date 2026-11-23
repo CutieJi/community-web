@@ -8,13 +8,12 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
-    {
-        $response = $this->get('/');
 
-        $response->assertStatus(200);
+    public function test_the_application_serves_the_react_mount_point(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('id="root"', false)
+            ->assertSee('name="csrf-token"', false);
     }
 }
